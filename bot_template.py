@@ -108,8 +108,8 @@ class BotTemplate(discord.Client):
     # 権限チェック
     def check_authority(self, id) -> False:                
         if DiscordData.is_bot_operator(id) or DiscordData.is_admin(id):
-            return False
-        return True
+            return True
+        return False
     
     # 終了
     async def quit(self, message: discord.Message): 
