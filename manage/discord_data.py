@@ -101,7 +101,7 @@ class DiscordData():
 
     @staticmethod
     def remove_bot_operator_id(command_issuer_id, member_id) -> bool:
-        if command_issuer_id != get_bot_data(KEY_ADMINISTRATOR_ID):
+        if command_issuer_id != get_bot_data(KEY_OPERATOR_ID):
             return False
         
         delete_bot_data(KEY_OPERATOR_ID, member_id)
@@ -109,18 +109,19 @@ class DiscordData():
 
     @staticmethod
     def is_bot_operator(command_issuer_id) -> bool:
-        id_liet = get_bot_data(KEY_ADMINISTRATOR_ID)
+        id_liet = get_bot_data(KEY_OPERATOR_ID)
         if id_liet is None:
             return False
-        
-        return set(id_liet) in command_issuer_id
+        if id_liet == []:
+            return False
+        return command_issuer_id in set(id_liet) 
         
     @staticmethod
     def add_reaction_channel_id(command_issuer_id, channel_id) -> bool:
         if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
             return False
         
-        update_bot_data(KEY_OPERATOR_ID, channel_id)
+        update_bot_data(KEY_REACTION_CHANNEL_ID, channel_id)
         return True
 
     @staticmethod
@@ -128,7 +129,7 @@ class DiscordData():
         if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
             return False
         
-        delete_bot_data(KEY_OPERATOR_ID, channel_id)
+        delete_bot_data(KEY_REACTION_CHANNEL_ID, channel_id)
         return True
 
     @staticmethod
@@ -140,8 +141,10 @@ class DiscordData():
         id_liet = get_bot_data(KEY_REACTION_CHANNEL_ID)
         if id_liet is None:
             return False
+        if id_liet == []:
+            return False
         
-        return set(id_liet) in channel_id
+        return channel_id in set(id_liet) 
 
     @staticmethod
     def is_admin(command_issuer_id) -> bool:

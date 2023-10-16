@@ -32,6 +32,7 @@ class BotTemplate(discord.Client):
         self.command_channel_id = DiscordData.get_command_channel_id()
         self.command_log_channel_id = DiscordData.get_command_log_channel_id()
         self.command = {}
+        self.operator_command = {}
         self.prefix = command_prefix
 
         self.add_command(f'{COMMAND_INSPECT} {self.bot_name}', self.inspect)
@@ -105,7 +106,7 @@ class BotTemplate(discord.Client):
         await self.post(channel_id, f"<@!{to}> \n{message}", attachment=attachment)
 
     # 権限チェック
-    async def check_authority(self, id) -> False:                
+    def check_authority(self, id) -> False:                
         if DiscordData.is_bot_operator(id) or DiscordData.is_admin(id):
             return False
         return True
