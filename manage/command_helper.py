@@ -18,17 +18,18 @@ def get_command_func(command:list, comamnd_dict:dict) -> tuple:
     if len(command) == 1:
         func = comamnd_dict[current_word]
         # コマンド実行まで足らない場合
-        if type(func) == dict:
+        if isinstance(func, dict):
             return ()
         
         return (func, None)        
     if current_word not in comamnd_dict:
         return ()
 
-    # 次もキーが存在した場合は再帰
+    # 次も辞書かつキーが存在した場合は再帰
     next_dict = comamnd_dict[current_word]
-    if command[1] in next_dict:
-        return get_command_func(comamnd_dict=comamnd_dict[current_word],command=command[1:])
+    if isinstance(next_dict, dict):    
+        if command[1] in next_dict:
+            return get_command_func(comamnd_dict=comamnd_dict[current_word],command=command[1:])
     
     return (comamnd_dict[current_word], command[1:])
 
@@ -36,7 +37,7 @@ def get_command(comamnd_dict:dict, pre_command:str = '') -> list:
     command_list = []
     for key in comamnd_dict.keys():
         temp = comamnd_dict[key]
-        if type(temp) == dict:
+        if isinstance(temp, dict):
             command_list.extend(get_command(comamnd_dict=temp,pre_command=f'{key} '))
         else:
             command_list.append(f'{pre_command}{key}')
