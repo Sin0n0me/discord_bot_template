@@ -11,6 +11,10 @@ COMMAND_PREFIX = '!'
 
 COMMAND_INSPECT = 'inspect'
 COMMAND_QUIT = 'quit'
+COMMAND_ADD_CHANNEL = 'add channel'
+COMMAND_REMOVE_CHANNEL = 'remove channel'
+COMMAND_ADD_OPERATOR = 'add operator'
+COMMAND_REMOVE_OPERATOR = 'remove operator'
 
 class CommandArgs:
     def __init__(self,message: discord.Message, command_args:list) -> None:
@@ -20,7 +24,6 @@ class CommandArgs:
 class BotTemplate(discord.Client):
     def __init__(self,bot_name , intents: discord.Intents, command_prefix=COMMAND_PREFIX, **options) -> None:
         super().__init__(intents=intents, **options)
-        
         
         check_discord_log_data_file()
         
@@ -32,6 +35,10 @@ class BotTemplate(discord.Client):
         self.prefix = command_prefix
 
         self.add_command(f'{COMMAND_INSPECT} {self.bot_name}', self.inspect)
+        self.add_command(f'{COMMAND_ADD_CHANNEL} {self.bot_name}', self.add_channel)
+        self.add_command(f'{COMMAND_REMOVE_CHANNEL} {self.bot_name}', self.remove_channel)
+        self.add_command(f'{COMMAND_ADD_OPERATOR} {self.bot_name}', self.add_operator)
+        self.add_command(f'{COMMAND_REMOVE_OPERATOR} {self.bot_name}', self.remove_operator)
 
     def add_command(self, command:str, func):
         command_dict = create_command_dict(command.split(' '), func)
@@ -46,6 +53,11 @@ class BotTemplate(discord.Client):
             write_command_failed_log(message)
             await message.add_reaction(BAD_EMOTICON)
             await self.replay(message.channel.id, message.author.id, 'unknown command')
+            return
+        
+        if not self.check_authority(message.author.id):
+            await self.post(message.channel.id, f'権限がありません')
+            await message.add_reaction(BAD_EMOTICON)
             return
         
         if await func[0](CommandArgs(message, func[1])):
@@ -92,6 +104,12 @@ class BotTemplate(discord.Client):
     async def replay(self, channel_id, to: int, message: str, attachment=None):
         await self.post(channel_id, f"<@!{to}> \n{message}", attachment=attachment)
 
+    # 権限チェック
+    async def check_authority(self, id) -> False:                
+        if DiscordData.is_bot_operator(id) or DiscordData.is_admin(id):
+            return False
+        return True
+    
     # 終了
     async def quit(self, message: discord.Message): 
         await message.add_reaction(GOOD_EMOTICON)
@@ -100,6 +118,10 @@ class BotTemplate(discord.Client):
         sys.exit(0)
         
     async def inspect(self, command: CommandArgs) -> bool: 
+        if len(command.command_args) != 0:
+            await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_INSPECT} {self.bot_name}')
+            return False
+        
         command_list = get_command(self.command)
 
         inspect_view = '## command list\n'
@@ -120,10 +142,84 @@ class BotTemplate(discord.Client):
         for i in reaction_view:
             inspect_view += f'<#{i}> \n'
         
-        await command.message.add_reaction(GOOD_EMOTICON)
         await self.post(command.message.channel.id, inspect_view)
         return True
     
+    async def add_channel(self, command: CommandArgs) -> bool:
+        if not DiscordData.is_admin(command.message.author.id):
+            await self.post(command.message.channel.id, f'管理者以外は実行できません')
+            return False
+
+        channel_id_list = command.command_args
+        if len(channel_id_list) == 0:
+            await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_ADD_CHANNEL} <channel>...')
+            return False
+        
+        if not all(isinstance(x, int) for x in channel_id_list):
+            await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
+            return False
+        
+        for id in channel_id_list:
+            DiscordData.add_reaction_channel_id(id)
+            
+        return True
+    
+    async def remove_channel(self, command: CommandArgs) -> bool: 
+        if not DiscordData.is_admin(command.message.author.id):
+            await self.post(command.message.channel.id, f'管理者以外は実行できません')
+            return False
+        
+        channel_id_list = command.command_args
+        if len(channel_id_list) == 0:
+            await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_REMOVE_CHANNEL} <channel>...')
+            return False
+        
+        if not all(isinstance(x, int) for x in channel_id_list):
+            await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
+            return False
+        
+        for id in channel_id_list:
+            DiscordData.remove_reaction_channel_id(id)
+            
+        return True
+
+    async def add_operator(self, command: CommandArgs) -> bool: 
+        if not DiscordData.is_admin(command.message.author.id):
+            await self.post(command.message.channel.id, f'管理者以外は実行できません')
+            return
+                    
+        channel_id_list = command.command_args
+        if len(channel_id_list) == 0:
+            await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_ADD_CHANNEL} <channel>...')
+            return False
+        
+        if not all(isinstance(x, int) for x in channel_id_list):
+            await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
+            return False
+        
+        for id in channel_id_list:
+            DiscordData.add_reaction_channel_id(id)
+            
+        return True
+    
+    async def remove_operator(self, command: CommandArgs) -> bool: 
+        if not DiscordData.is_admin(command.message.author.id):
+            await self.post(command.message.channel.id, f'管理者以外は実行できません')
+            return False
+                
+        channel_id_list = command.command_args
+        if len(channel_id_list) == 0:
+            await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_REMOVE_CHANNEL} <channel>...')
+            return False
+        
+        if not all(isinstance(x, int) for x in channel_id_list):
+            await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
+            return False
+        
+        for id in channel_id_list:
+            DiscordData.remove_reaction_channel_id(id)
+            
+        return True
 
 def main(command_prefix = COMMAND_PREFIX):
     if not DiscordData.check_discord_data_file():
