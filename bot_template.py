@@ -32,8 +32,6 @@ class BotTemplate(discord.Client):
         self.prefix = command_prefix
 
         self.add_command(f'{COMMAND_INSPECT} {self.bot_name}', self.inspect)
-        
-        print(get_command(self.command))
 
     def add_command(self, command:str, func):
         command_dict = create_command_dict(command.split(' '), func)
@@ -50,7 +48,6 @@ class BotTemplate(discord.Client):
             await self.replay(message.channel.id, message.author.id, 'unknown command')
             return
         
-        print(func)
         if await func[0](CommandArgs(message, func[1])):
             write_command_success_log(message)
             await message.add_reaction(GOOD_EMOTICON)
@@ -110,16 +107,18 @@ class BotTemplate(discord.Client):
         for i in command_list:
             inspect_view += f'`{i}`\n'
         
-        inspect_view += f'\n## channel\n'
-        inspect_view += f'post: <#{DiscordData.get_post_channel_id()}>'
-        inspect_view += f'command: <#{DiscordData.get_command_channel_id()}>'
-        inspect_view += f'command log: <#{DiscordData.get_command_log_channel_id()}>'
-        inspect_view += 'reaction channel list'
-        inspect_view += '---\n'
-        
+        channel_view = [
+            '\n## channel\n',
+            f'post: <#{DiscordData.get_post_channel_id()}>',
+            f'command: <#{DiscordData.get_command_channel_id()}>',
+            f'command log: <#{DiscordData.get_command_log_channel_id()}>',
+            'reaction channel list',
+            '---',
+        ]
+        inspect_view + '\n'.join(channel_view)
         reaction_view = DiscordData.get_reaction_channel_id()
         for i in reaction_view:
-            inspect_view += f'<#{i}>\n'
+            inspect_view += f'<#{i}> \n'
         
         await command.message.add_reaction(GOOD_EMOTICON)
         await self.post(command.message.channel.id, inspect_view)
