@@ -102,7 +102,7 @@ class BotTemplate(discord.Client):
         await self.close()
         sys.exit(0)
         
-    async def inspect(self, message: discord.Message, args:list) -> bool: 
+    async def inspect(self, command: CommandArgs) -> bool: 
         command_list = get_command(self.command)
 
         inspect_view = '## command list\n'
@@ -121,8 +121,8 @@ class BotTemplate(discord.Client):
         for i in reaction_view:
             inspect_view += f'<#{i}>\n'
         
-        await message.add_reaction(GOOD_EMOTICON)
-        await self.post(message.channel.id, inspect_view)
+        await command.message.add_reaction(GOOD_EMOTICON)
+        await self.post(command.message.channel.id, inspect_view)
         return True
     
 
