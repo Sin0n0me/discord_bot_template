@@ -115,7 +115,7 @@ class BotTemplate(discord.Client):
             'reaction channel list',
             '---',
         ]
-        inspect_view + '\n'.join(channel_view)
+        inspect_view += '\n'.join(channel_view)
         reaction_view = DiscordData.get_reaction_channel_id()
         for i in reaction_view:
             inspect_view += f'<#{i}> \n'
