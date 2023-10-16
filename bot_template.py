@@ -106,10 +106,8 @@ class BotTemplate(discord.Client):
         await self.post(channel_id, f"<@!{to}> \n{message}", attachment=attachment)
 
     # 権限チェック
-    def check_authority(self, id) -> False:                
-        if DiscordData.is_bot_operator(id) or DiscordData.is_admin(id):
-            return True
-        return False
+    def check_authority(self, id) -> bool: 
+        return DiscordData.is_admin(id) or DiscordData.is_bot_operator(id)
     
     # 終了
     async def quit(self, message: discord.Message): 
