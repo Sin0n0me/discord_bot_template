@@ -42,3 +42,14 @@ def get_command(comamnd_dict:dict, pre_command:str = '') -> list:
             command_list.append(f'{pre_command}{key}')
         
     return command_list
+
+def merge_nested_dicts(d1:dict, d2:dict):
+    for key, value in d2.items():
+        if key in d1:
+            if isinstance(d1[key], dict) and isinstance(value, dict):
+                merge_nested_dicts(d1[key], value)
+            else:
+                d1[key] = value
+        else:
+            d1[key] = value
+    return d1

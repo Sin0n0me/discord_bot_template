@@ -41,15 +41,32 @@ class BotTemplate(discord.Client):
         self.add_command(f'{COMMAND_ADD_OPERATOR} {self.bot_name}', self.add_operator)
         self.add_command(f'{COMMAND_REMOVE_OPERATOR} {self.bot_name}', self.remove_operator)
 
+    def add_operator_command(self, command:str, func):
+        command_dict = create_command_dict(command.split(' '), func)
+        if command_dict == {}:
+            return
+        
+        self.operator_command = merge_nested_dicts(self.operator_command,command_dict)
+
     def add_command(self, command:str, func):
         command_dict = create_command_dict(command.split(' '), func)
         if command_dict == {}:
             return
         
-        self.command.update(command_dict)
+        self.command = merge_nested_dicts(self.command,command_dict)
                 
-    async def exec_command(self, command:str, message: discord.Message):        
+    async def exec_command(self, command:str, message: discord.Message): 
         func = get_command_func(command.split(' '), self.command)
+        if func != ():
+            if await func[0](CommandArgs(message, func[1])):
+                write_command_success_log(message)
+                await message.add_reaction(GOOD_EMOTICON)
+            else:
+                write_command_failed_log(message)
+                await message.add_reaction(BAD_EMOTICON)
+        
+        # operator
+        func = get_command_func(command.split(' '), self.operator_command)
         if func == ():
             write_command_failed_log(message)
             await message.add_reaction(BAD_EMOTICON)
