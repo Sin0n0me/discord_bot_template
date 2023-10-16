@@ -19,21 +19,6 @@ JSON_DATA_FORMAT = {
     KEY_COMMAND_CHANNEL_ID: 0,
     KEY_COMMAND_LOG_CHANNEL_ID: 0,
 }
-
-# 存在しない,読み込めない場合は新規作成
-def check_discord_data_file() -> bool:
-    if not os.path.exists(DISCORD_DATA_FILE_NAME):
-        create_discord_data_file()
-        return False
-        
-    try:
-        with open(DISCORD_DATA_FILE_NAME, 'r') as file:
-            json.load(file)        
-    except:
-        create_discord_data_file()
-        return False
-        
-    return True
         
 def create_discord_data_file():
     directry = os.path.dirname(DISCORD_DATA_FILE_NAME)    
@@ -84,64 +69,96 @@ def delete_bot_data(key, value=None):
 
 ### 
 
-def get_token():
-    return get_bot_data(KEY_TOKEN)
-
-def get_post_channel_id():
-    return get_bot_data(KEY_POST_CHANNEL_ID)
-
-def get_command_channel_id():
-    return get_bot_data(KEY_COMMAND_CHANNEL_ID)
-
-def get_command_log_channel_id():
-    return get_bot_data(KEY_COMMAND_LOG_CHANNEL_ID)
-
-def add_bot_operator_id(command_issuer_id, member_id) -> bool:
-    if command_issuer_id != get_bot_data(KEY_ADMINISTRATOR_ID):
-        return False
+class DiscordData():
+    couner = 0
     
-    update_bot_data(KEY_OPERATOR_ID, member_id)
-    return True
+    @staticmethod
+    def get_token():
+        if DiscordData.couner != 0:
+            return None
+        DiscordData.couner += 1
+        return get_bot_data(KEY_TOKEN)
 
-def remove_bot_operator_id(command_issuer_id, member_id) -> bool:
-    if command_issuer_id != get_bot_data(KEY_ADMINISTRATOR_ID):
-        return False
-    
-    delete_bot_data(KEY_OPERATOR_ID, member_id)
-    return True
+    @staticmethod
+    def get_post_channel_id():
+        return get_bot_data(KEY_POST_CHANNEL_ID)
 
-def is_bot_operator(command_issuer_id) -> bool:
-    id_liet = get_bot_data(KEY_ADMINISTRATOR_ID)
-    if id_liet is None:
-        return False
-    
-    return set(id_liet) in command_issuer_id
-    
-def add_reaction_channel_id(command_issuer_id, channel_id) -> bool:
-    if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
-        return False
-    
-    update_bot_data(KEY_OPERATOR_ID, channel_id)
-    return True
+    @staticmethod
+    def get_command_channel_id():
+        return get_bot_data(KEY_COMMAND_CHANNEL_ID)
 
-def remove_reaction_channel_id(command_issuer_id, channel_id) -> bool:
-    if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
-        return False
-    
-    delete_bot_data(KEY_OPERATOR_ID, channel_id)
-    return True
+    @staticmethod
+    def get_command_log_channel_id():
+        return get_bot_data(KEY_COMMAND_LOG_CHANNEL_ID)
 
-def is_reaction_channel(channel_id) -> bool:
-    id_liet = get_bot_data(KEY_REACTION_CHANNEL_ID)
-    if id_liet is None:
-        return False
-    
-    return set(id_liet) in channel_id
+    @staticmethod
+    def add_bot_operator_id(command_issuer_id, member_id) -> bool:
+        if command_issuer_id != get_bot_data(KEY_ADMINISTRATOR_ID):
+            return False
+        
+        update_bot_data(KEY_OPERATOR_ID, member_id)
+        return True
 
-def is_admin(command_issuer_id) -> bool:
-    id = get_bot_data(KEY_ADMINISTRATOR_ID)
-    if not id:
-        return False
+    @staticmethod
+    def remove_bot_operator_id(command_issuer_id, member_id) -> bool:
+        if command_issuer_id != get_bot_data(KEY_ADMINISTRATOR_ID):
+            return False
+        
+        delete_bot_data(KEY_OPERATOR_ID, member_id)
+        return True
+
+    @staticmethod
+    def is_bot_operator(command_issuer_id) -> bool:
+        id_liet = get_bot_data(KEY_ADMINISTRATOR_ID)
+        if id_liet is None:
+            return False
+        
+        return set(id_liet) in command_issuer_id
+        
+    @staticmethod
+    def add_reaction_channel_id(command_issuer_id, channel_id) -> bool:
+        if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
+            return False
+        
+        update_bot_data(KEY_OPERATOR_ID, channel_id)
+        return True
+
+    @staticmethod
+    def remove_reaction_channel_id(command_issuer_id, channel_id) -> bool:
+        if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
+            return False
+        
+        delete_bot_data(KEY_OPERATOR_ID, channel_id)
+        return True
+
+    @staticmethod
+    def is_reaction_channel(channel_id) -> bool:
+        id_liet = get_bot_data(KEY_REACTION_CHANNEL_ID)
+        if id_liet is None:
+            return False
+        
+        return set(id_liet) in channel_id
+
+    @staticmethod
+    def is_admin(command_issuer_id) -> bool:
+        id = get_bot_data(KEY_ADMINISTRATOR_ID)
+        if not id:
+            return False
+        
+        return id == command_issuer_id
     
-    return id == command_issuer_id
-    
+    # 存在しない,読み込めない場合は新規作成
+    @staticmethod
+    def check_discord_data_file() -> bool:
+        if not os.path.exists(DISCORD_DATA_FILE_NAME):
+            create_discord_data_file()
+            return False
+            
+        try:
+            with open(DISCORD_DATA_FILE_NAME, 'r') as file:
+                json.load(file)        
+        except:
+            create_discord_data_file()
+            return False
+            
+        return True
