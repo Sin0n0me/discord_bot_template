@@ -54,8 +54,11 @@ def update_bot_data(key, value, is_overwrite=False):
             data = list(set(data)) 
         elif isinstance(data, dict):
             data.update(data)
-
-    data = value       
+        else:
+            data = value
+    else:
+        data = value
+        
     discord_data[key] = data
     
     with open(DISCORD_DATA_FILE_NAME, 'w') as file:
@@ -99,7 +102,7 @@ class DiscordData():
         return get_bot_data(KEY_COMMAND_LOG_CHANNEL_ID)
 
     @staticmethod
-    def add_bot_operator_id(command_issuer_id, member_id) -> bool:
+    def add_bot_operator_id(command_issuer_id, member_id:int) -> bool:
         if not DiscordData.is_admin(command_issuer_id) and not DiscordData.is_bot_operator(command_issuer_id):
             return False
         
@@ -124,7 +127,7 @@ class DiscordData():
         return command_issuer_id in set(id_liet) 
         
     @staticmethod
-    def add_reaction_channel_id(command_issuer_id, channel_id) -> bool:
+    def add_reaction_channel_id(command_issuer_id, channel_id:int) -> bool:
         if not DiscordData.is_admin(command_issuer_id) and not DiscordData.is_bot_operator(command_issuer_id):
             return False
         
