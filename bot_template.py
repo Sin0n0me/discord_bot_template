@@ -62,7 +62,7 @@ class BotTemplate(discord.Client):
     async def exec_command(self, command:str, message: discord.Message): 
         func = get_command_func(command.split(' '), self.command)
         if func != ():
-            if await func[0](CommandArgs(message, func[1])):
+            if await func[0](CommandArgs(message, [] if func[1] is None else func[1])):
                 write_command_success_log(message)
                 await message.add_reaction(GOOD_EMOTICON)
             else:
@@ -214,7 +214,7 @@ class BotTemplate(discord.Client):
             return False
         
         for id in channel_id_list:
-            DiscordData.remove_reaction_channel_id(command.message.author.id,id)
+            DiscordData.remove_reaction_channel_id(command.message.author.id, id)
             
         return True
 
@@ -234,7 +234,7 @@ class BotTemplate(discord.Client):
             return False
         
         for id in channel_id_list:
-            DiscordData.add_reaction_channel_id(id)
+            DiscordData.add_reaction_channel_id(command.message.author.id, id)
             
         return True
     
@@ -254,7 +254,7 @@ class BotTemplate(discord.Client):
             return False
         
         for id in channel_id_list:
-            DiscordData.remove_reaction_channel_id(id)
+            DiscordData.remove_reaction_channel_id(command.message.author.id, id)
             
         return True
 
