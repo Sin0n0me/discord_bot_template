@@ -10,6 +10,8 @@ def create_command_dict(command:list, func) -> dict:
 # 0: func
 # 1: args
 def get_command_func(command:list, comamnd_dict:dict) -> tuple:
+    print(command)
+    print(comamnd_dict)
     if command == []:
         return ()
     current_word = command[0]
@@ -17,11 +19,8 @@ def get_command_func(command:list, comamnd_dict:dict) -> tuple:
         return ()    
     if len(command) == 1:
         func = comamnd_dict[current_word]
-        # コマンド実行まで足らない場合
-        if isinstance(func, dict):
-            return ()
-        
-        return (func, None)        
+        # コマンドが途中までの場合は空のタプルを返す
+        return () if isinstance(func, dict) else (func, None)
     if current_word not in comamnd_dict:
         return ()
 
@@ -30,7 +29,10 @@ def get_command_func(command:list, comamnd_dict:dict) -> tuple:
     if isinstance(next_dict, dict):    
         if command[1] in next_dict:
             return get_command_func(comamnd_dict=comamnd_dict[current_word],command=command[1:])
-    
+        else:
+        # コマンドが途中までの場合は空のタプルを返す
+            return ()
+            
     return (comamnd_dict[current_word], command[1:])
 
 def get_command(comamnd_dict:dict, pre_command:str = '') -> list:
