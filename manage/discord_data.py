@@ -135,7 +135,8 @@ class DiscordData():
 
     @staticmethod
     def get_reaction_channel_id() -> list:
-        return list(get_bot_data(KEY_REACTION_CHANNEL_ID))
+        data = get_bot_data(KEY_REACTION_CHANNEL_ID)        
+        return data if isinstance(data, list) else [data]
 
     @staticmethod
     def is_reaction_channel(channel_id) -> bool:
