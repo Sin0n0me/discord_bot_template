@@ -38,7 +38,7 @@ def get_command(comamnd_dict:dict, pre_command:str = '') -> list:
     for key in comamnd_dict.keys():
         temp = comamnd_dict[key]
         if isinstance(temp, dict):
-            command_list.extend(get_command(comamnd_dict=temp,pre_command=f'{key} '))
+            command_list.extend(get_command(comamnd_dict=temp,pre_command=f'{pre_command}{key} '))
         else:
             command_list.append(f'{pre_command}{key}')
         
