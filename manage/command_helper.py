@@ -10,8 +10,6 @@ def create_command_dict(command:list, func) -> dict:
 # 0: func
 # 1: args
 def get_command_func(command:list, comamnd_dict:dict) -> tuple:
-    print(command)
-    print(comamnd_dict)
     if command == []:
         return ()
     current_word = command[0]

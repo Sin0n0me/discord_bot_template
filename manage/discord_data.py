@@ -45,13 +45,19 @@ def get_bot_data(key):
 def update_bot_data(key, value, is_overwrite=False):
     with open(DISCORD_DATA_FILE_NAME, 'r') as file:
         discord_data: dict = json.load(file)
+    
+    data = discord_data[key] 
+        
+    if not is_overwrite:
+        if isinstance(data, list):
+            data.append(value)
+            data = list(set(data)) 
+        elif isinstance(data, dict):
+            data.update(data)
 
-    if type(value) is list and not is_overwrite:
-        discord_data[key].append(value)
-        discord_data[key] = list(set(discord_data[key]))
-    else:        
-        discord_data[key] = value       
-
+    data = value       
+    discord_data[key] = data
+    
     with open(DISCORD_DATA_FILE_NAME, 'w') as file:
         json.dump(fp=file, obj=discord_data, indent=4)
 
