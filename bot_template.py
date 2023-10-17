@@ -168,7 +168,7 @@ class BotTemplate(discord.Client):
             f'command: <#{DiscordData.get_command_channel_id()}>',
             f'command log: <#{DiscordData.get_command_log_channel_id()}>',
             'reaction channel list',
-            '---',
+            '---\n',
         ]
         inspect_view += '\n'.join(channel_view)
         reaction_view = DiscordData.get_reaction_channel_id()

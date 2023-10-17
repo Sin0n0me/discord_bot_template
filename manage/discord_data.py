@@ -48,6 +48,7 @@ def update_bot_data(key, value, is_overwrite=False):
 
     if type(value) is list and not is_overwrite:
         discord_data[key].append(value)
+        discord_data[key] = list(set(discord_data[key]))
     else:        
         discord_data[key] = value       
 
@@ -80,15 +81,15 @@ class DiscordData():
         return get_bot_data(KEY_TOKEN)
 
     @staticmethod
-    def get_post_channel_id():
+    def get_post_channel_id() -> int:
         return get_bot_data(KEY_POST_CHANNEL_ID)
 
     @staticmethod
-    def get_command_channel_id():
+    def get_command_channel_id() -> int:
         return get_bot_data(KEY_COMMAND_CHANNEL_ID)
 
     @staticmethod
-    def get_command_log_channel_id():
+    def get_command_log_channel_id() -> int:
         return get_bot_data(KEY_COMMAND_LOG_CHANNEL_ID)
 
     @staticmethod
@@ -134,7 +135,7 @@ class DiscordData():
 
     @staticmethod
     def get_reaction_channel_id() -> list:
-        return get_bot_data(KEY_REACTION_CHANNEL_ID)
+        return list(get_bot_data(KEY_REACTION_CHANNEL_ID))
 
     @staticmethod
     def is_reaction_channel(channel_id) -> bool:
