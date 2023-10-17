@@ -50,7 +50,7 @@ def write_log(file,  message: discord.Message, details=''):
     message = message.content
     
     '| time | message-id | user-id | channel-id | message | details'
-    log = f'{time} {message_id} {user_id} {channel_id} {message} {details}' 
+    log = f'{time} {message_id} <@!{user_id}> <#{channel_id}> {message} {details}' 
     print(log)
     with open(file, mode='a') as file:
         file.write(log)
