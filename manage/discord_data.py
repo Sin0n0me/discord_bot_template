@@ -93,7 +93,7 @@ class DiscordData():
 
     @staticmethod
     def add_bot_operator_id(command_issuer_id, member_id) -> bool:
-        if command_issuer_id != get_bot_data(KEY_ADMINISTRATOR_ID):
+        if not DiscordData.is_admin(command_issuer_id) and not DiscordData.is_bot_operator(command_issuer_id):
             return False
         
         update_bot_data(KEY_OPERATOR_ID, member_id)
@@ -101,7 +101,7 @@ class DiscordData():
 
     @staticmethod
     def remove_bot_operator_id(command_issuer_id, member_id) -> bool:
-        if command_issuer_id != get_bot_data(KEY_OPERATOR_ID):
+        if not DiscordData.is_admin(command_issuer_id) and not DiscordData.is_bot_operator(command_issuer_id):
             return False
         
         delete_bot_data(KEY_OPERATOR_ID, member_id)
@@ -118,7 +118,7 @@ class DiscordData():
         
     @staticmethod
     def add_reaction_channel_id(command_issuer_id, channel_id) -> bool:
-        if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
+        if not DiscordData.is_admin(command_issuer_id) and not DiscordData.is_bot_operator(command_issuer_id):
             return False
         
         update_bot_data(KEY_REACTION_CHANNEL_ID, channel_id)
@@ -126,7 +126,7 @@ class DiscordData():
 
     @staticmethod
     def remove_reaction_channel_id(command_issuer_id, channel_id) -> bool:
-        if command_issuer_id != get_bot_data(KEY_REACTION_CHANNEL_ID):
+        if not DiscordData.is_admin(command_issuer_id) and not DiscordData.is_bot_operator(command_issuer_id):
             return False
         
         delete_bot_data(KEY_REACTION_CHANNEL_ID, channel_id)

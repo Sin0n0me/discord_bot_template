@@ -194,7 +194,7 @@ class BotTemplate(discord.Client):
             return False
          
         for id in id_list:
-            DiscordData.add_reaction_channel_id(id)
+            DiscordData.add_reaction_channel_id(command.message.author.id, id)
             
         return True
     
@@ -214,7 +214,7 @@ class BotTemplate(discord.Client):
             return False
         
         for id in channel_id_list:
-            DiscordData.remove_reaction_channel_id(id)
+            DiscordData.remove_reaction_channel_id(command.message.author.id,id)
             
         return True
 
