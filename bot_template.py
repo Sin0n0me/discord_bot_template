@@ -1,6 +1,7 @@
 #!/usr/bin/python3.8
 
 import sys
+import re
 import discord
 from discord.ext import commands, tasks
 from .manage import *
@@ -15,6 +16,9 @@ COMMAND_ADD_CHANNEL = 'add channel'
 COMMAND_REMOVE_CHANNEL = 'remove channel'
 COMMAND_ADD_OPERATOR = 'add operator'
 COMMAND_REMOVE_OPERATOR = 'remove operator'
+
+CHANNEL_PATTERN = re.compile(r'<#(\d+)>')
+USER_PATTERN = re.compile(r'<@(\d+)>')
 
 class CommandArgs:
     def __init__(self,message: discord.Message, command_args:list) -> None:
@@ -63,7 +67,8 @@ class BotTemplate(discord.Client):
                 await message.add_reaction(GOOD_EMOTICON)
             else:
                 write_command_failed_log(message)
-                await message.add_reaction(BAD_EMOTICON)
+                await message.add_reaction(BAD_EMOTICON)                
+            return
         
         # operator
         func = get_command_func(command.split(' '), self.operator_command)
@@ -133,6 +138,18 @@ class BotTemplate(discord.Client):
         await self.close()
         sys.exit(0)
         
+    @staticmethod
+    def check_args_pattern(check_list:list, pattern: re.Pattern,continue_even_if_no_match=False) -> list:
+        match_list = [pattern.fullmatch(s) for s in check_list]        
+        id_list = []
+        for match in match_list:
+            if not match and not continue_even_if_no_match:
+                return []
+            
+            id_list.append(match.group(1))
+        
+        return id_list
+        
     async def inspect(self, command: CommandArgs) -> bool: 
         if len(command.command_args) != 0:
             await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_INSPECT} {self.bot_name}')
@@ -170,12 +187,13 @@ class BotTemplate(discord.Client):
         if len(channel_id_list) == 0:
             await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_ADD_CHANNEL} <channel>...')
             return False
-        
-        if not all(isinstance(x, int) for x in channel_id_list):
+                
+        id_list = self.check_args_pattern(channel_id_list, CHANNEL_PATTERN)
+        if id_list == []:
             await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
             return False
-        
-        for id in channel_id_list:
+         
+        for id in id_list:
             DiscordData.add_reaction_channel_id(id)
             
         return True
@@ -190,7 +208,8 @@ class BotTemplate(discord.Client):
             await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_REMOVE_CHANNEL} <channel>...')
             return False
         
-        if not all(isinstance(x, int) for x in channel_id_list):
+        id_list = self.check_args_pattern(channel_id_list, CHANNEL_PATTERN)
+        if id_list == []:
             await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
             return False
         
@@ -209,7 +228,8 @@ class BotTemplate(discord.Client):
             await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_ADD_CHANNEL} <channel>...')
             return False
         
-        if not all(isinstance(x, int) for x in channel_id_list):
+        id_list = self.check_args_pattern(channel_id_list, USER_PATTERN)
+        if id_list == []:
             await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
             return False
         
@@ -228,7 +248,8 @@ class BotTemplate(discord.Client):
             await self.post(command.message.channel.id, f'{self.prefix}{COMMAND_REMOVE_CHANNEL} <channel>...')
             return False
         
-        if not all(isinstance(x, int) for x in channel_id_list):
+        id_list = self.check_args_pattern(channel_id_list, USER_PATTERN)
+        if id_list == []:
             await self.post(command.message.channel.id, f'チャンネルID以外が含まれています')
             return False
         
